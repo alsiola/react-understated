@@ -5,6 +5,7 @@ interface AppState {
     caps: boolean;
     name: string;
     count: number;
+    items: string[];
 }
 
 interface AppSetters {
@@ -20,10 +21,11 @@ export const App: React.SFC<{}> = () => (
         setters={{ square: sq }}
         initialState={{
             name: "Alex",
-            count: 0
+            count: 0,
+            items: []
         }}
     >
-        {({ setters, state: { name, count, caps } }) => {
+        {({ setters, state: { name, count, caps, items } }) => {
             return (
                 <>
                     <div>
@@ -45,6 +47,19 @@ export const App: React.SFC<{}> = () => (
                         </button>
                         <button onClick={setters.square("count")}>
                             Square
+                        </button>
+                    </div>
+                    <div>
+                        {items.map((item, i) => <div key={i}>{item}</div>)}
+                        <button onClick={setters.push("items", name)}>
+                            Push
+                        </button>
+                        <button onClick={setters.pop("items")}>Pop</button>
+                        <button onClick={setters.unshift("items", name)}>
+                            Shift
+                        </button>
+                        <button onClick={setters.shift("items")}>
+                            Unshift
                         </button>
                     </div>
                 </>
