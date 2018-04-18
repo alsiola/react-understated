@@ -73,3 +73,43 @@ const MyComponent = () => (
 ````
 
 Because I am a kind person who spent a few hours writing ridiculous TypeScript, your custom helpers are still type-safe! If you try and pass a state property to square that isn't a number then boom, compiler error.
+
+### Higher Order Component
+We all love functional purity and referential transparency. I mean I do, and you'd be silly to disagree with me.  Understated's higher order component can give you a pretty little API that looks like I would like it to:
+
+```
+const MyComponent = (props, { state, setters }) => (
+    <div>{props.name}</div>
+);
+
+export default HOC({
+    initialState: {
+        name: "Alex"
+    }
+})(MyComponent);
+```
+
+Typescript support comes via the USComponent type:
+
+```
+interface MyPropsInterface {
+    name: string;
+}
+
+interface MyStateInterface {
+    age: number;
+}
+
+const MyComponent: USComponent<MyPropsInterface, MyStateInterface> = ({ name }, { state: { age }, setters }) => (
+    <>
+        <div>{props.name} is {age} years old!</div>
+        <button onClick={setters.increment("age")}>Click on {name}'s birthday</button>
+    </>
+);
+
+export default HOC({
+    initialState: {
+        name: "Alex"
+    }
+})(MyComponent);
+```
