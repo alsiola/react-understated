@@ -1,20 +1,31 @@
 import * as React from "react";
+import { Component } from "react";
 
 export type SetArgs<T, U extends keyof T> = Pick<T, U> | ((a: T) => Pick<T, U>);
 
-type HelpersWithNevers<T, U> = {
-    [KT in keyof T]: {
-        [K in keyof U]: {
-            [prop in KT]: U[K] extends (a: T[KT]) => T[KT]
-                ? (prop: KT) => () => Promise<T[KT]>
+type HelpersWithNevers<TProps, TSetters> = {
+    [PropKey in keyof TProps]: {
+        [SetterKey in keyof TSetters]: {
+            [prop in PropKey]: TSetters[SetterKey] extends (
+                a: TProps[PropKey]
+            ) => TProps[PropKey]
+                ? (prop: PropKey) => () => Promise<void>
                 : never
-        }[KT]
+        }[PropKey]
     }
 };
 
-type Helpers<T, U, V = HelpersWithNevers<T, U>> = {
-    [K in keyof V]: V[K] extends (a: V[K]) => never ? never : V[K]
-}[keyof V];
+type Helpers<
+    TProps,
+    TSetters,
+    RawHelpers = HelpersWithNevers<TProps, TSetters>
+> = {
+    [RawHelperKey in keyof RawHelpers]: RawHelpers[RawHelperKey] extends (
+        a: RawHelpers[RawHelperKey]
+    ) => never
+        ? never
+        : RawHelpers[RawHelperKey]
+}[keyof RawHelpers];
 
 export type TypedSetter<T, V, R = void> = <U extends keyof PropsOfType<T, V>>(
     a: U
@@ -67,7 +78,7 @@ type PropsOfType<T, U> = Pick<T, UPropertyNames<T, U>>;
 export class Understated<
     T,
     V extends Record<string, (a: any) => any>
-> extends React.Component<UnderstatedProps<T, V>, T> {
+> extends Component<UnderstatedProps<T, V>, T> {
     public static create<U, W>() {
         return (Understated as any) as new () => React.Component<
             UnderstatedProps<U, W>,
